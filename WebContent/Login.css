@@ -1,0 +1,12 @@
+@charset "UTF-8";
+
+.root {
+	background-image: url('https://colorlib.com/etc/lf/Login_v9/images/bg-01.jpg');
+	background-size: cover;
+	background-repeat: no-repeat;
+	flex-wrap: wrap;
+	min-height: 100vh;
+}
+.before {
+	background: linear-gradient(-180deg, #4AEC74 4%, rgba(241, 241, 241, 0.32) 100%);
+}

@@ -9,13 +9,14 @@ import java.util.ArrayList;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.leoaslan.model.beans.Task;
 import com.leoaslan.model.bo.HomeBO;
-
+import com.leoaslan.model.bo.LoginBO;
 /**
  * Servlet implementation class Home
  */
@@ -23,86 +24,118 @@ import com.leoaslan.model.bo.HomeBO;
 public class HomeServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	HomeBO homeBO = new HomeBO();
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public HomeServlet() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
-    
-    private void listTodos(HttpServletRequest request, HttpServletResponse response) throws ClassNotFoundException, SQLException, ServletException, IOException {
-    	ArrayList<Task> tasks = homeBO.getAllTasks();
-    	request.setAttribute("listTasks",tasks);
-    	RequestDispatcher requestDispatcher = request.getRequestDispatcher("/TodoList.jsp");
-    	requestDispatcher.forward(request, response);
-	}
-    
-    private void createTodo(HttpServletRequest request, HttpServletResponse response) throws ClassNotFoundException, SQLException, ServletException, IOException, ParseException {
-    	String taskName = request.getParameter("taskName");
-    	String taskDescription = request.getParameter("taskDescription");
-    	String targetDate = request.getParameter("targetDate");
-    
-    	Task task = new Task(taskName, taskDescription, new SimpleDateFormat("yyyy-MM-dd").parse(targetDate));
-    	homeBO.insertTask(task);
-    	response.sendRedirect("list");
-	}
-    
-    private void showForm(HttpServletRequest request, HttpServletResponse response) throws ClassNotFoundException, SQLException, ServletException, IOException {
-    	String taskId = request.getParameter("taskId");
-    	
-    	if (taskId != null) {
-    		Task task = homeBO.getTaskById(Integer.parseInt(taskId));
-    		
-    		if (task != null) 
-    			request.setAttribute("task", task);
-    	}
-    	
-    	RequestDispatcher requestDispatcher = request.getRequestDispatcher("/CreateTodo.jsp");
-    	requestDispatcher.forward(request, response);
-	}
-    
-    private void doneTask(HttpServletRequest request, HttpServletResponse response) throws ClassNotFoundException, SQLException, ServletException, IOException {
-    	String taskId = request.getParameter("taskId");
-    	System.out.println(taskId);
-    	homeBO.changeStatus(Integer.parseInt(taskId), "done");
-    	
-    	response.sendRedirect("list");
-    }
-    
-    private void editTask(HttpServletRequest request, HttpServletResponse response) throws ClassNotFoundException, SQLException, ServletException, IOException, NumberFormatException, ParseException {
-    	String taskId = request.getParameter("taskId");
-    	String taskName = request.getParameter("taskName");
-    	String taskDescription = request.getParameter("taskDescription");
-    	String status = request.getParameter("status");
-    	String targetDate = request.getParameter("targetDate");
-    	
-    	Task task = new Task(Integer.parseInt(taskId), taskName, taskDescription, status, new SimpleDateFormat("MM-dd-yyyy").parse(targetDate));
-    	
-    	homeBO.updateTask(task);
-    	
-    	response.sendRedirect("list");
-    }
-    
-    private void deleteTask(HttpServletRequest request, HttpServletResponse response) throws NumberFormatException, ClassNotFoundException, SQLException, IOException {
-    	String taskId = request.getParameter("taskId");
-    	
-    	homeBO.deleteTask(Integer.parseInt(taskId));
-    	response.sendRedirect("list");
-    }
+	LoginBO loginBO = new LoginBO();
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#HttpServlet()
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public HomeServlet() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	private void listTodos(HttpServletRequest request, HttpServletResponse response)
+			throws ClassNotFoundException, SQLException, ServletException, IOException {
+		ArrayList<Task> tasks = homeBO.getAllTasks();
+		request.setAttribute("listTasks", tasks);
+		RequestDispatcher requestDispatcher = request.getRequestDispatcher("/TodoList.jsp");
+		requestDispatcher.forward(request, response);
+	}
+
+	private void createTodo(HttpServletRequest request, HttpServletResponse response)
+			throws ClassNotFoundException, SQLException, ServletException, IOException, ParseException {
+		String taskName = request.getParameter("taskName");
+		String taskDescription = request.getParameter("taskDescription");
+		String targetDate = request.getParameter("targetDate");
+
+		Task task = new Task(taskName, taskDescription, new SimpleDateFormat("yyyy-MM-dd").parse(targetDate));
+		homeBO.insertTask(task);
+		response.sendRedirect("list");
+	}
+
+	private void showForm(HttpServletRequest request, HttpServletResponse response)
+			throws ClassNotFoundException, SQLException, ServletException, IOException {
+		String taskId = request.getParameter("taskId");
+
+		if (taskId != null) {
+			Task task = homeBO.getTaskById(Integer.parseInt(taskId));
+
+			if (task != null)
+				request.setAttribute("task", task);
+		}
+
+		RequestDispatcher requestDispatcher = request.getRequestDispatcher("/CreateTodo.jsp");
+		requestDispatcher.forward(request, response);
+	}
+
+	private void doneTask(HttpServletRequest request, HttpServletResponse response)
+			throws ClassNotFoundException, SQLException, ServletException, IOException {
+		String taskId = request.getParameter("taskId");
+		System.out.println(taskId);
+		homeBO.changeStatus(Integer.parseInt(taskId), "done");
+
+		response.sendRedirect("list");
+	}
+
+	private void editTask(HttpServletRequest request, HttpServletResponse response) throws ClassNotFoundException,
+			SQLException, ServletException, IOException, NumberFormatException, ParseException {
+		String taskId = request.getParameter("taskId");
+		String taskName = request.getParameter("taskName");
+		String taskDescription = request.getParameter("taskDescription");
+		String status = request.getParameter("status");
+		String targetDate = request.getParameter("targetDate");
+
+		Task task = new Task(Integer.parseInt(taskId), taskName, taskDescription, status,
+				new SimpleDateFormat("MM-dd-yyyy").parse(targetDate));
+
+		homeBO.updateTask(task);
+
+		response.sendRedirect("list");
+	}
+
+	private void deleteTask(HttpServletRequest request, HttpServletResponse response)
+			throws NumberFormatException, ClassNotFoundException, SQLException, IOException {
+		String taskId = request.getParameter("taskId");
+
+		homeBO.deleteTask(Integer.parseInt(taskId));
+		response.sendRedirect("list");
+	}
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		Cookie cookies[] = request.getCookies();
+		String auth = "auth";
+		String token = "";
+		boolean isAuthenticated = false;
+		if (cookies != null)
+			for (Cookie cookie : cookies) {
+				if (auth.equals(cookie.getName()))
+					if (cookie.getValue() != null) {
+						System.out.println(cookie.getValue());
+						token = cookie.getValue();
+						
+						isAuthenticated = loginBO.verifyToken(token);
+						System.out.println(isAuthenticated);
+						break;
+					}
+			}
+
+		if (!isAuthenticated) {
+			response.sendRedirect(request.getContextPath() + "/login");
+			return;
+		}
+
 		String action = request.getServletPath();
 		try {
 			switch (action) {
 			case "/list":
-				listTodos(request, response); 	
+				listTodos(request, response);
 				break;
-			case "/form": 
+			case "/form":
 				showForm(request, response);
 				break;
 			case "/insert":
@@ -136,9 +169,11 @@ public class HomeServlet extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
